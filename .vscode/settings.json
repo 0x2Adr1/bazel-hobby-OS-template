@@ -1,0 +1,7 @@
+{
+    "clangd.arguments": [
+        "--compile-commands-dir=bazel-bin"
+    ],
+    "editor.formatOnSave": true,
+    "bazel.buildifierFixOnFormat": true
+}

@@ -1,0 +1,11 @@
+try-import .bazelrc.user
+
+build --cpu=x86_64
+build --crosstool_top=//toolchain
+build --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
+build --experimental_strict_action_env
+
+# Debug config
+build:debug --strip=never
+build:debug --cxxopt=-g
+build:debug --cxxopt=-O1

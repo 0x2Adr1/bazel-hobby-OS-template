@@ -1,0 +1,8 @@
+tags
+peda*
+.gdb_history
+.DS_Store
+.cache
+compile_commands.json
+bazel-*
+.bazelrc.user
