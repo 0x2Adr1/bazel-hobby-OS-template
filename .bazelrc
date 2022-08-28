@@ -1,9 +1,19 @@
 try-import .bazelrc.user
 
+# Makes the sandbox environment minimal with only PATH=/bin:/usr/bin:/usr/local/bin
+# Even though I like the idea, the problem is that on MacOS with homebrew, apps are installed under /opt/homebrew/bin
+# So we have three options:
+# - Do not use --experimental_strict_action_env
+# - Put the burden on the user and let them define variables for each host tool like XORRISO_PATH=/opt/homebrew/bin/xorriso
+#   in their .bazelrc.user
+# - Add some magic in our bazel rules
+#
+# For now, we just do not enable --experimental_strict_action_env
+#build --experimental_strict_action_env
+
 build --cpu=x86_64
 build --crosstool_top=//toolchain
 build --host_crosstool_top=@bazel_tools//tools/cpp:toolchain
-build --experimental_strict_action_env
 
 # Debug config
 build:debug --strip=never

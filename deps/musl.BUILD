@@ -58,8 +58,6 @@ cc_library(
     ]),
     copts = [
         "-std=c99",
-        "-nostdinc",
-        "-ffreestanding",
         "-Os",
         "-pipe",
         "-fexcess-precision=standard",
@@ -71,6 +69,11 @@ cc_library(
         "-ffunction-sections",
         "-fdata-sections",
         "-fPIC",
+        "-Wno-ignored-optimization-argument",
+        "-Wno-unsupported-floating-point-opt",
+        "-Wno-shift-op-parentheses",
+        "-Wno-unknown-pragmas",
+        "-Wno-parentheses",
     ],
     includes = [
         # Must be first!

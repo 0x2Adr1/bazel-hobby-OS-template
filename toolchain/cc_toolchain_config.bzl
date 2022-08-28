@@ -25,28 +25,34 @@ def toolchain_config_impl(ctx):
 
     host_toolchain = find_cpp_toolchain(ctx)
 
-    if "COMPILER_ABS_PATH" in ctx.configuration.default_shell_env:
-        compiler_path = ctx.configuration.default_shell_env["COMPILER_ABS_PATH"]
-    else:
-        compiler_path = host_toolchain.compiler_executable
+    toolchain_tools = {
+        "CXX": host_toolchain.compiler_executable,
+        "LD": host_toolchain.ld_executable,
+        "AR": host_toolchain.ar_executable,
+    }
 
-    if "LINKER_ABS_PATH" in ctx.configuration.default_shell_env:
-        linker_path = ctx.configuration.default_shell_env["LINKER_ABS_PATH"]
-    else:
-        linker_path = host_toolchain.ld_executable
+    for k in toolchain_tools.keys():
+        if k in ctx.configuration.default_shell_env:
+            toolchain_tools[k] = ctx.configuration.default_shell_env[k]
+
+    compiler_executable = toolchain_tools["CXX"]
+    linker_executable = toolchain_tools["LD"]
+    ar_executable = toolchain_tools["AR"]
+
+    compiler_type = "gcc" if "gcc" in compiler_executable else "clang"
 
     tool_paths = [
         tool_path(
             name = "gcc",
-            path = compiler_path,
+            path = compiler_executable,
         ),
         tool_path(
             name = "ld",
-            path = linker_path,
+            path = linker_executable,
         ),
         tool_path(
             name = "ar",
-            path = host_toolchain.ar_executable,
+            path = ar_executable,
         ),
         tool_path(
             name = "cpp",
@@ -70,7 +76,49 @@ def toolchain_config_impl(ctx):
         ),
     ]
 
+    common_compilation_flags = [
+        # Do not use the toolchain headers!
+        "-nostdinc",
+
+        # https://stackoverflow.com/questions/17692428/what-is-ffreestanding-option-in-gcc
+        # https://gcc.gnu.org/onlinedocs/gcc/Standards.html
+        "-ffreestanding",
+
+        # Enable all warnings
+        "-Wall",
+
+        # Treat warning as error
+        "-Werror",
+
+        # Stop compilation at the first error
+        "-Wfatal-errors",
+
+        # Enable extra warnings
+        "-Wextra",
+    ]
+
+    if compiler_type == "clang":
+        common_compilation_flags.append("--target=x86_64-pc-none-elf")
+
     action_configs = [
+        action_config(
+            action_name = ACTION_NAMES.c_compile,
+            enabled = True,
+            flag_sets = [
+                flag_set(
+                    flag_groups = ([
+                        flag_group(
+                            flags = [
+                                "-std=c11",
+                            ] + common_compilation_flags,
+                        ),
+                    ]),
+                ),
+            ],
+            tools = [
+                tool(path = compiler_executable),
+            ],
+        ),
         action_config(
             action_name = ACTION_NAMES.cpp_compile,
             enabled = True,
@@ -79,22 +127,14 @@ def toolchain_config_impl(ctx):
                     flag_groups = ([
                         flag_group(
                             flags = [
-                                # Do not use the toolchain headers!
-                                "-nostdinc",
-
-                                # We use C++ 20
                                 "-std=c++20",
-
-                                # https://stackoverflow.com/questions/17692428/what-is-ffreestanding-option-in-gcc
-                                # https://gcc.gnu.org/onlinedocs/gcc/Standards.html
-                                "-ffreestanding",
-                            ],
+                            ] + common_compilation_flags,
                         ),
                     ]),
                 ),
             ],
             tools = [
-                tool(path = compiler_path),
+                tool(path = compiler_executable),
             ],
         ),
         action_config(
@@ -112,12 +152,41 @@ def toolchain_config_impl(ctx):
                 ),
             ],
             tools = [
-                tool(path = linker_path),
+                tool(path = linker_executable),
+            ],
+        ),
+        action_config(
+            action_name = ACTION_NAMES.cpp_link_static_library,
+            enabled = True,
+            flag_sets = [
+                flag_set(
+                    flag_groups = ([
+                        flag_group(flags = ["rcsD"]),
+                        flag_group(
+                            flags = ["%{output_execpath}"],
+                            expand_if_available = "output_execpath",
+                        ),
+                    ]),
+                ),
+                flag_set(
+                    flag_groups = [
+                        flag_group(
+                            iterate_over = "libraries_to_link",
+                            flag_groups = [
+                                flag_group(
+                                    flags = ["%{libraries_to_link.name}"],
+                                ),
+                            ],
+                            expand_if_available = "libraries_to_link",
+                        ),
+                    ],
+                ),
+            ],
+            tools = [
+                tool(path = ar_executable),
             ],
         ),
     ]
-
-    compiler_type = "gcc" if "gcc" in compiler_path else "clang"
 
     return cc_common.create_cc_toolchain_config_info(
         ctx = ctx,

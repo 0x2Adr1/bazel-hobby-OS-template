@@ -36,8 +36,7 @@ http_archive(
     name = "liballoc",
     build_file = "//deps:liballoc.BUILD",
     patches = [
-        "//deps:liballoc_use_v1.1.patch",
-        "//deps:liballoc_LIBALLOC_PREFIX.patch",
+        "//deps:liballoc.patch",
     ],
     strip_prefix = "liballoc-1.1",
     urls = ["https://github.com/blanham/liballoc/archive/refs/tags/1.1.tar.gz"],
