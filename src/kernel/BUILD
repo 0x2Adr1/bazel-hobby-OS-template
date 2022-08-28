@@ -10,17 +10,6 @@ cc_binary(
         ":linker.ld",
     ],
     copts = [
-        # Enable all warnings
-        "-Wall",
-
-        # Treat warning as error
-        "-Werror",
-
-        # Stop compilation at the first error
-        "-Wfatal-errors",
-
-        # Enable extra warnings
-        "-Wextra",
 
         # We don't support C++ exceptions!
         "-fno-exceptions",
@@ -28,7 +17,6 @@ cc_binary(
         # https://en.wikipedia.org/wiki/Run-time_type_information
         # We don't support C++ RTTI
         "-fno-rtti",
-        "-ffreestanding",
 
         # https://mudongliang.github.io/2016/05/24/stack-protector.html
         "-fno-stack-protector",
@@ -38,7 +26,6 @@ cc_binary(
         # https://en.wikipedia.org/wiki/Position-independent_code
         "-fno-pic",
         "-m64",
-        "-march=x86-64",
         "-mabi=sysv",
         "-mno-80387",
         "-mno-mmx",
