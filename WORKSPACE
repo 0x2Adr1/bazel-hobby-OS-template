@@ -41,3 +41,10 @@ http_archive(
     strip_prefix = "liballoc-1.1",
     urls = ["https://github.com/blanham/liballoc/archive/refs/tags/1.1.tar.gz"],
 )
+
+# Nix
+http_archive(
+    name = "io_tweag_rules_nixpkgs",
+    strip_prefix = "rules_nixpkgs-140abffc482fe4610eab261f5b7da97c142b3e94",
+    urls = ["https://github.com/tweag/rules_nixpkgs/archive/140abffc482fe4610eab261f5b7da97c142b3e94.tar.gz"],
+)

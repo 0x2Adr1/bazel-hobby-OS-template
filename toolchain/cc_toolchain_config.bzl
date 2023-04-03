@@ -127,7 +127,7 @@ def toolchain_config_impl(ctx):
                     flag_groups = ([
                         flag_group(
                             flags = [
-                                "-std=c++20",
+                                "-std=c++2b",
                             ] + common_compilation_flags,
                         ),
                     ]),
