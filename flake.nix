@@ -24,8 +24,11 @@
                 coreutils-full
                 curlFull
 
+                stdenv.cc.cc.lib
+                gcc-unwrapped.lib
                 llvmPackages_15.llvm
                 llvmPackages_15.libclang
+                llvmPackages_15.libcxxabi
                 lld_15
 
                 git
@@ -41,7 +44,6 @@
             ];
 
             shellHook = ''
-                alias cc=gcc
                 # patch binary from toybox breaks some of bazel repository rules when running `bazel sync`
                 # override path to force use of gnupatch instead
                 export PATH="${pkgs.gnupatch}/bin:''${PATH}"

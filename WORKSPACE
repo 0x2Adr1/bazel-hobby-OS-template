@@ -11,11 +11,11 @@ load("@com_grail_bazel_compdb//:deps.bzl", "bazel_compdb_deps")
 
 bazel_compdb_deps()
 
-http_archive(
+new_git_repository(
     name = "limine",
     build_file = "//deps:limine.BUILD",
-    strip_prefix = "limine-3.16.2-binary",
-    urls = ["https://github.com/limine-bootloader/limine/archive/refs/tags/v3.16.2-binary.tar.gz"],
+    remote = "https://github.com/limine-bootloader/limine.git",
+    tag = "v4.20230330.0-binary",
 )
 
 new_git_repository(
@@ -42,9 +42,13 @@ http_archive(
     urls = ["https://github.com/blanham/liballoc/archive/refs/tags/1.1.tar.gz"],
 )
 
-# Nix
-http_archive(
-    name = "io_tweag_rules_nixpkgs",
-    strip_prefix = "rules_nixpkgs-140abffc482fe4610eab261f5b7da97c142b3e94",
-    urls = ["https://github.com/tweag/rules_nixpkgs/archive/140abffc482fe4610eab261f5b7da97c142b3e94.tar.gz"],
+register_execution_platforms(
+    "//:local_host_platform",
+    "//:hobby_os_platform",
+)
+
+register_toolchains(
+    "//toolchain:clang_toolchain",
+    "//toolchain:default_linux_toolchain",
+    "//toolchain:default_macos_toolchain",
 )

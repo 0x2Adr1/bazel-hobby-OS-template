@@ -42,6 +42,9 @@ cc_binary(
         "-static",
         "--script=$(location :linker.ld)",
     ],
+    target_compatible_with = [
+        "@platforms//os:none",
+    ],
     deps = [
         "@ia32",
         "@liballoc",

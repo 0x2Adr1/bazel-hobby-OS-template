@@ -16,6 +16,8 @@ compilation_database(
     ],
 )
 
+LINUX_GCC_LIB_DIR = "/nix/store/shasq3azl2298vqkvq5mc7vivdqp3yrj-gcc-12.2.0-lib/lib"
+
 genrule(
     name = "boot_iso",
     srcs = [
@@ -37,7 +39,20 @@ genrule(
                     -no-emul-boot -boot-load-size 4 -boot-info-table \
 		            --efi-boot limine-cd-efi.bin \
 		            -efi-boot-part --efi-boot-image --protective-msdos-label \
-		            iso_root -o $@ ;
-	            $(location @limine//:limine-deploy) $@""",
+		            iso_root -o $@ ; """ + select({
+        "@platforms//os:none": "LD_LIBRARY_PATH={LINUX_GCC_LIB_DIR} $(location @limine//:limine-deploy) $@".format(LINUX_GCC_LIB_DIR = LINUX_GCC_LIB_DIR),
+    }),
     tools = ["@limine//:limine-deploy"],
+)
+
+platform(
+    name = "local_host_platform",
+    parents = ["@local_config_platform//:host"],
+)
+
+platform(
+    name = "hobby_os_platform",
+    constraint_values = [
+        "@platforms//os:none",
+    ],
 )

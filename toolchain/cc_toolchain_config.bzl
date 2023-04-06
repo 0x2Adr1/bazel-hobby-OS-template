@@ -7,10 +7,6 @@ load(
     "tool",
     "tool_path",
 )
-load(
-    "@bazel_tools//tools/cpp:toolchain_utils.bzl",
-    "find_cpp_toolchain",
-)
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 
 def toolchain_config_impl(ctx):
@@ -23,56 +19,59 @@ def toolchain_config_impl(ctx):
         ),
     ]
 
-    host_toolchain = find_cpp_toolchain(ctx)
-
-    toolchain_tools = {
-        "CXX": host_toolchain.compiler_executable,
-        "LD": host_toolchain.ld_executable,
-        "AR": host_toolchain.ar_executable,
+    mac_toolchain_tools = {
+        "CXX": "/nix/store/4hs6da0ihz147wl8yyqhw12ymb3rjz0z-clang-15.0.7/bin/clang-15",
+        "LD": "/nix/store/qii1yq15asjnlr3l7a652dxkm28vhs5d-lld-15.0.7/bin/ld.lld",
+        "AR": "/nix/store/485bq8n1s649znxgi9wvq88wqgm9pn1r-llvm-15.0.7/bin/llvm-ar",
     }
 
-    for k in toolchain_tools.keys():
-        if k in ctx.configuration.default_shell_env:
-            toolchain_tools[k] = ctx.configuration.default_shell_env[k]
+    linux_toolchain_tools = {
+        "CXX": "/nix/store/hhgbk0gvfml5z5y4y5g9f7qrk7a4cbx6-clang-15.0.7/bin/clang-15",
+        "LD": "/nix/store/45x7bvx5sywsha7pmg19x1vkvg69zbbi-lld-15.0.7/bin/ld.lld",
+        "AR": "/nix/store/5k596flfwq7aa3s15s0qkxx7xkgpg2cj-llvm-15.0.7/bin/llvm-ar",
+        "CPP": "/nix/store/h5003wsy3qqimqvrkn3bc5mwq4hhidag-gcc-wrapper-12.2.0/bin/cpp",
+        "GCOV": "/nix/store/p975i9blgmkjfxpnlvdmm0xvjg573b6l-gcc-12.2.0/bin/gcov",
+        "NM": "/nix/store/5k596flfwq7aa3s15s0qkxx7xkgpg2cj-llvm-15.0.7/bin/llvm-nm",
+        "OBJDUMP": "/nix/store/485bq8n1s649znxgi9wvq88wqgm9pn1r-llvm-15.0.7/bin/llvm-objdump",
+        "STRIP": "/nix/store/485bq8n1s649znxgi9wvq88wqgm9pn1r-llvm-15.0.7/bin/llvm-strip",
+    }
 
-    compiler_executable = toolchain_tools["CXX"]
-    linker_executable = toolchain_tools["LD"]
-    ar_executable = toolchain_tools["AR"]
+    toolchain_tools = linux_toolchain_tools
 
-    compiler_type = "gcc" if "gcc" in compiler_executable else "clang"
+    compiler_type = "clang-15.0.7"
 
     tool_paths = [
         tool_path(
             name = "gcc",
-            path = compiler_executable,
+            path = toolchain_tools["CXX"],
         ),
         tool_path(
             name = "ld",
-            path = linker_executable,
+            path = toolchain_tools["LD"],
         ),
         tool_path(
             name = "ar",
-            path = ar_executable,
+            path = toolchain_tools["AR"],
         ),
         tool_path(
             name = "cpp",
-            path = host_toolchain.preprocessor_executable,
+            path = toolchain_tools["CPP"],
         ),
         tool_path(
             name = "gcov",
-            path = host_toolchain.gcov_executable,
+            path = toolchain_tools["GCOV"],
         ),
         tool_path(
             name = "nm",
-            path = host_toolchain.nm_executable,
+            path = toolchain_tools["NM"],
         ),
         tool_path(
             name = "objdump",
-            path = host_toolchain.objdump_executable,
+            path = toolchain_tools["OBJDUMP"],
         ),
         tool_path(
             name = "strip",
-            path = host_toolchain.strip_executable,
+            path = toolchain_tools["STRIP"],
         ),
     ]
 
@@ -95,9 +94,12 @@ def toolchain_config_impl(ctx):
 
         # Enable extra warnings
         "-Wextra",
+
+        # We use limine's terminal feature which is now deprecated...
+        "-Wno-error=deprecated-declarations",
     ]
 
-    if compiler_type == "clang":
+    if "clang" in compiler_type:
         common_compilation_flags.append("--target=x86_64-pc-none-elf")
 
     action_configs = [
@@ -116,7 +118,7 @@ def toolchain_config_impl(ctx):
                 ),
             ],
             tools = [
-                tool(path = compiler_executable),
+                tool(path = toolchain_tools["CXX"]),
             ],
         ),
         action_config(
@@ -134,7 +136,7 @@ def toolchain_config_impl(ctx):
                 ),
             ],
             tools = [
-                tool(path = compiler_executable),
+                tool(path = toolchain_tools["CXX"]),
             ],
         ),
         action_config(
@@ -152,7 +154,7 @@ def toolchain_config_impl(ctx):
                 ),
             ],
             tools = [
-                tool(path = linker_executable),
+                tool(path = toolchain_tools["LD"]),
             ],
         ),
         action_config(
@@ -183,7 +185,7 @@ def toolchain_config_impl(ctx):
                 ),
             ],
             tools = [
-                tool(path = ar_executable),
+                tool(path = toolchain_tools["AR"]),
             ],
         ),
     ]
@@ -192,21 +194,15 @@ def toolchain_config_impl(ctx):
         ctx = ctx,
         action_configs = action_configs,
         features = features,
-        toolchain_identifier = "osdev_toolchain",
-        host_system_name = "local",
-        target_system_name = "local",
+        toolchain_identifier = "os_toolchain",
+        target_system_name = "unknown",
         target_cpu = "x86_64",
         target_libc = "unknown",
         compiler = compiler_type,
-        abi_version = "unknown",
-        abi_libc_version = "unknown",
         tool_paths = tool_paths,
     )
 
 cc_toolchain_config_osdev = rule(
     implementation = toolchain_config_impl,
-    attrs = {
-        "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_host_toolchain")),
-    },
     provides = [CcToolchainConfigInfo],
 )
