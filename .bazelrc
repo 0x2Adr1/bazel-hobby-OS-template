@@ -1,7 +1,11 @@
 build --macos_sdk_version=13.1
 
+build:mac --//toolchain:host_os=macos
+build:linux --//toolchain:host_os=linux
+
 build --platforms=//:hobby_os_platform
-build --host_platform=//:local_host_platform
+build --host_platform=@local_config_platform//:host
+build --extra_execution_platforms=@local_config_platform//:host
 
 build --incompatible_enable_cc_toolchain_resolution
 

@@ -46,11 +46,6 @@ genrule(
 )
 
 platform(
-    name = "local_host_platform",
-    parents = ["@local_config_platform//:host"],
-)
-
-platform(
     name = "hobby_os_platform",
     constraint_values = [
         "@platforms//os:none",

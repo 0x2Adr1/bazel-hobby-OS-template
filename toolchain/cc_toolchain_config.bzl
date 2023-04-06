@@ -19,10 +19,18 @@ def toolchain_config_impl(ctx):
         ),
     ]
 
+    print("AAAAAAA")
+    print(ctx.attr.host_os)
+
     mac_toolchain_tools = {
         "CXX": "/nix/store/4hs6da0ihz147wl8yyqhw12ymb3rjz0z-clang-15.0.7/bin/clang-15",
         "LD": "/nix/store/qii1yq15asjnlr3l7a652dxkm28vhs5d-lld-15.0.7/bin/ld.lld",
         "AR": "/nix/store/485bq8n1s649znxgi9wvq88wqgm9pn1r-llvm-15.0.7/bin/llvm-ar",
+        "CPP": "/nix/store/cy78am69kj3d2r286rd7wg0cv48gqa3z-clang-wrapper-11.1.0/bin/cpp",
+        "GCOV": "/nix/store/485bq8n1s649znxgi9wvq88wqgm9pn1r-llvm-15.0.7/bin/llvm-cov",
+        "NM": "/nix/store/485bq8n1s649znxgi9wvq88wqgm9pn1r-llvm-15.0.7/bin/llvm-nm",
+        "OBJDUMP": "/nix/store/485bq8n1s649znxgi9wvq88wqgm9pn1r-llvm-15.0.7/bin/llvm-objdump",
+        "STRIP": "/nix/store/485bq8n1s649znxgi9wvq88wqgm9pn1r-llvm-15.0.7/bin/llvm-strip",
     }
 
     linux_toolchain_tools = {
@@ -36,7 +44,7 @@ def toolchain_config_impl(ctx):
         "STRIP": "/nix/store/485bq8n1s649znxgi9wvq88wqgm9pn1r-llvm-15.0.7/bin/llvm-strip",
     }
 
-    toolchain_tools = linux_toolchain_tools
+    toolchain_tools = linux_toolchain_tools if ctx.attr.host_os == "linux" else mac_toolchain_tools
 
     compiler_type = "clang-15.0.7"
 
@@ -205,4 +213,7 @@ def toolchain_config_impl(ctx):
 cc_toolchain_config_osdev = rule(
     implementation = toolchain_config_impl,
     provides = [CcToolchainConfigInfo],
+    attrs = {
+        "host_os": attr.string(mandatory = True),
+    },
 )

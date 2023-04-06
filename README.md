@@ -13,7 +13,7 @@ This template was tested successfully on:
 - Ubuntu 22.04 LTS
 - MacBook Pro M1 (Ventura 13.2.1)
 
-# Build
+# Setting up the environment
 
 We use [Nix](https://nixos.org/) to guarantee a deterministic and reproducible build environment.
 
@@ -23,11 +23,25 @@ We use [Nix](https://nixos.org/) to guarantee a deterministic and reproducible b
 $ nix-shell --pure
 ```
 
-You can then build a bootable ISO (and a `compile_commands.json`) with the following command:
+# Build
+
+## On macOS
+
+Use the `--config mac` when you invoke `bazel build` like so:
 
 ```
-$ bazelisk build //:compdb //:boot_iso
+$ bazelisk build --config mac //:compdb //:boot_iso
 ```
+
+## On Linux
+
+Use the `--config linux` when you invoke `bazel build` like so:
+
+```
+$ bazelisk build --config linux //:compdb //:boot_iso
+```
+
+# Bazel Targets
 
 The `//:compdb` target generates the `compilation_commands.json` file.
 The `//:boot_iso` target generates the bootable ISO image.

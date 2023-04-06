@@ -1,6 +1,26 @@
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 load(":cc_toolchain_config.bzl", "cc_toolchain_config_osdev")
 
 filegroup(name = "empty")
+
+string_flag(
+    name = "host_os",
+    build_setting_default = "linux",
+)
+
+config_setting(
+    name = "host_os_linux",
+    flag_values = {
+        ":host_os": "linux",
+    },
+)
+
+config_setting(
+    name = "host_os_macos",
+    flag_values = {
+        ":host_os": "macos",
+    },
+)
 
 cc_toolchain(
     name = "cc_toolchain",
@@ -15,7 +35,13 @@ cc_toolchain(
     toolchain_identifier = "os_toolchain",
 )
 
-cc_toolchain_config_osdev(name = "cc_toolchain_config")
+cc_toolchain_config_osdev(
+    name = "cc_toolchain_config",
+    host_os = select({
+        ":host_os_linux": "linux",
+        ":host_os_macos": "macos",
+    }),
+)
 
 toolchain(
     name = "clang_toolchain",
@@ -49,6 +75,6 @@ toolchain(
     target_compatible_with = [
         "@platforms//os:macos",
     ],
-    toolchain = "@local_config_cc//:cc-compiler-k8",  # TODO: Use native ARM for Mac M1/M2...?
+    toolchain = "@local_config_cc//:cc-compiler-darwin",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
