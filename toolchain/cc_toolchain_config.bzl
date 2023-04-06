@@ -19,9 +19,6 @@ def toolchain_config_impl(ctx):
         ),
     ]
 
-    print("AAAAAAA")
-    print(ctx.attr.host_os)
-
     mac_toolchain_tools = {
         "CXX": "/nix/store/4hs6da0ihz147wl8yyqhw12ymb3rjz0z-clang-15.0.7/bin/clang-15",
         "LD": "/nix/store/qii1yq15asjnlr3l7a652dxkm28vhs5d-lld-15.0.7/bin/ld.lld",
