@@ -11,7 +11,7 @@ It provides the following components:
 
 This template was tested successfully on:
 - Ubuntu 22.04 LTS
-- MacBook Pro M1 (Ventura 13.2.1)
+- MacBook Pro M1 (Ventura 13.4)
 
 # Setting up the environment
 
@@ -20,17 +20,34 @@ We use [Nix](https://nixos.org/) to guarantee a deterministic and reproducible b
 [Install Nix](https://nixos.org/download.html) and then run:
 
 ```
-$ nix-shell --pure
+$ nix-shell
 ```
 
 # Build
 
 ## On macOS
 
-Use the `--config mac` when you invoke `bazel build` like so:
+Update `.bazelrc` with your locally installed macOS SDK version.
+You can list your installed SDKs with:
+```
+$ xcrun --sdk macosx --show-sdk-path
+
+# output example:
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.3.sdk
+```
+
+In this example, make sure you have:
 
 ```
-$ bazelisk build --config mac //:compdb //:boot_iso
+build:macos --macos_sdk_version=13.3
+```
+
+In your `.bazelrc`
+
+Then use the `--config macos` when you invoke `bazelisk build` like so:
+
+```
+$ bazelisk build --config macos //:compdb //:boot_iso
 ```
 
 ## On Linux
@@ -44,6 +61,7 @@ $ bazelisk build --config linux //:compdb //:boot_iso
 # Bazel Targets
 
 The `//:compdb` target generates the `compilation_commands.json` file.
+
 The `//:boot_iso` target generates the bootable ISO image.
 
 # Run

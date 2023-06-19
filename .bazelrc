@@ -1,6 +1,8 @@
-build --macos_sdk_version=13.1
+# Replace with your locally installed SDK version
+# $ xcrun --sdk macosx --show-sdk-path
+build:macos --macos_sdk_version=13.3
+build:macos --//toolchain:host_os=macos
 
-build:mac --//toolchain:host_os=macos
 build:linux --//toolchain:host_os=linux
 
 build --platforms=//:hobby_os_platform

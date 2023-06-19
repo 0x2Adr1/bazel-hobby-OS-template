@@ -2,7 +2,8 @@
     description = "HobbyOS";
 
     inputs = {
-        nixpkgs.url = "github:NixOS/nixpkgs/c47370e2cc335cb987577ff5fa26c9f29cc7774e";
+        # https://github.com/NixOS/nixpkgs/releases/tag/23.05
+        nixpkgs.url = "github:NixOS/nixpkgs/4ecab3273592f27479a583fb6d975d4aba3486fe";
         flake-utils.url = "github:numtide/flake-utils";
         flake-compat = {
             url = "github:edolstra/flake-compat";

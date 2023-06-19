@@ -28,7 +28,7 @@ new_git_repository(
     name = "limine",
     build_file = "//deps:limine.BUILD",
     remote = "https://github.com/limine-bootloader/limine.git",
-    tag = "v4.20230330.0-binary",
+    tag = "v4.20230615.0-binary",
 )
 
 new_git_repository(
@@ -41,8 +41,8 @@ new_git_repository(
 http_archive(
     name = "musl",
     build_file = "//deps:musl.BUILD",
-    strip_prefix = "musl-1.2.3",
-    urls = ["https://git.musl-libc.org/cgit/musl/snapshot/musl-1.2.3.tar.gz"],
+    strip_prefix = "musl-1.2.4",
+    urls = ["https://git.musl-libc.org/cgit/musl/snapshot/musl-1.2.4.tar.gz"],
 )
 
 http_archive(
